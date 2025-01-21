@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 public class MainCalendarController implements Initializable {
 
     @FXML
-    private Button create_event_button;
+    private Button create_event_button, prev_month_button, next_month_button;
 
     @FXML
     private DatePicker event_datepicker;
@@ -142,11 +142,13 @@ public class MainCalendarController implements Initializable {
     }
 
     public void go_to_next_month(ActionEvent event) {
-
+        date_focus = date_focus.plusMonths(1);
+        make_month();
     }
 
     public void go_to_prev_month(ActionEvent event) {
-
+        date_focus = date_focus.minusMonths(1);
+        make_month();
     }
 
     public void display_events() {
