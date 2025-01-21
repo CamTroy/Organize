@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,6 +17,7 @@ import javafx.scene.text.Text;
 import javax.swing.*;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,9 @@ public class MainCalendarController implements Initializable {
 
     @FXML
     private FlowPane month_flowpane;
+
+    @FXML
+    private TextField event_name_field;
 
     ZonedDateTime date_focus, today;
 
@@ -99,13 +104,11 @@ public class MainCalendarController implements Initializable {
                         List<CalendarActivity> activity_list = null;
                         try {
                             activity_list = events.get(date_for_getting.toLocalDate());
-                            System.out.println("The activity list is here!" + activity_list);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                         
                         if (activity_list != null) {
-                            System.out.println("activity list is NOT null");
                             create_event_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
                         }
                     }
@@ -160,11 +163,22 @@ public class MainCalendarController implements Initializable {
     }
 
     public void create_event(ActionEvent event) {
-        //TODO
 
-        // Sample code
-        CalendarActivity activity = new CalendarActivity("Bruh", "Bruh", today.plusDays(3));
-        events.put(activity.get_start_date().toLocalDate(), List.of(activity));
+        try {
+
+            LocalDate event_localdate = LocalDate.parse(event_datepicker.getValue().toString());
+            ZonedDateTime event_date = event_localdate.atStartOfDay(ZoneId.systemDefault());
+
+            String event_name = event_name_field.getText();
+
+            if (event_name.isEmpty()) event_name = "Bruh";
+
+            CalendarActivity activity = new CalendarActivity(event_name, "Bruh", event_date);
+            events.put(activity.get_start_date().toLocalDate(), List.of(activity));
+        } catch (Exception e) {
+            System.out.println("Invalid date: " +event_datepicker.getValue().toString());
+        }
+
         System.out.println(events);
         make_month();
     }
