@@ -19,10 +19,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainCalendarController implements Initializable {
 
@@ -48,6 +45,7 @@ public class MainCalendarController implements Initializable {
 
     boolean do_not_disturb;
 
+    List<CalendarActivity> activities_list = new ArrayList<>();
     Map<LocalDate, List<CalendarActivity>> events = new HashMap<>();
 
     @Override
@@ -107,7 +105,7 @@ public class MainCalendarController implements Initializable {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        
+
                         if (activity_list != null) {
                             create_event_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
                         }
@@ -121,9 +119,10 @@ public class MainCalendarController implements Initializable {
     }
 
     private void create_event_on_calendar(List<CalendarActivity> activity_list, double rectangle_height, double rectangle_width, StackPane pane) {
+
         VBox activity_vbox = new VBox();
         for (int i = 0; i < activity_list.size(); i++) {
-            if(i >= 2) {
+            if (i >= 2) {
                 Text moreActivities = new Text("...");
                 activity_vbox.getChildren().add(moreActivities);
                 moreActivities.setOnMouseClicked(mouseEvent -> {
@@ -131,14 +130,25 @@ public class MainCalendarController implements Initializable {
                 });
                 break;
             }
-            Text text = new Text(activity_list.get(i).get_title() + ", " + activity_list.get(i).get_description());
+            String title = activity_list.get(i).get_title();
+            String description = activity_list.get(i).get_description();
+            Text text = new Text(title + ", " + description);
             activity_vbox.getChildren().add(text);
             text.setOnMouseClicked(mouseEvent -> {
                 System.out.println(text.getText());
+
+                for (int j = 0; j < activity_list.size(); j++) {
+                    if (activities_list.get(j).get_title().equals(title)) {
+                        System.out.println("Found!");
+                        activities_list.remove(activities_list.get(j));
+                        events = create_map(activities_list);
+                        make_month();
+                    }
+                }
             });
         }
         activity_vbox.setTranslateY((rectangle_height / 2) * 0.20);
-        activity_vbox.setMaxWidth(rectangle_width* 0.8);
+        activity_vbox.setMaxWidth(rectangle_width * 0.8);
         activity_vbox.setMaxHeight(rectangle_height * 0.65);
         activity_vbox.setStyle("-fx-background-color:#a6a6ff");
         pane.getChildren().add(activity_vbox);
@@ -174,12 +184,30 @@ public class MainCalendarController implements Initializable {
             if (event_name.isEmpty()) event_name = "Bruh";
 
             CalendarActivity activity = new CalendarActivity(event_name, "Bruh", event_date);
-            events.put(activity.get_start_date().toLocalDate(), List.of(activity));
+            activities_list.add(activity);
+//            events.put(activity.get_start_date().toLocalDate(), List.of(activity));
+            events = create_map(activities_list);
         } catch (Exception e) {
-            System.out.println("Invalid date: " +event_datepicker.getValue().toString());
+            System.out.println("Invalid date: " + event_datepicker.getValue().toString());
         }
 
         System.out.println(events);
         make_month();
+    }
+
+    private Map<LocalDate, List<CalendarActivity>> create_map(List<CalendarActivity> activities) {
+
+        Map<LocalDate, List<CalendarActivity>> event_map = new HashMap<>();
+
+        for (CalendarActivity activity : activities) {
+
+            if (event_map.containsKey(activity.get_start_date().toLocalDate())) {
+                event_map.get(activity.get_start_date().toLocalDate()).add(activity);
+            } else {
+                event_map.put(activity.get_start_date().toLocalDate(), List.of(activity));
+            }
+        }
+
+        return event_map;
     }
 }
