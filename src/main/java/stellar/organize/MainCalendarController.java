@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-import javax.swing.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -27,7 +26,7 @@ public class MainCalendarController implements Initializable {
     private Button create_event_button, prev_month_button, next_month_button;
 
     @FXML
-    private DatePicker event_datepicker;
+    private DatePicker event_start_datepicker, event_end_datepicker;
 
     @FXML
     private CheckBox dnd_checkbox;
@@ -39,7 +38,7 @@ public class MainCalendarController implements Initializable {
     private FlowPane month_flowpane;
 
     @FXML
-    private TextField event_name_field;
+    private TextField event_name_field, event_description_field;
 
     ZonedDateTime date_focus, today;
 
@@ -76,7 +75,7 @@ public class MainCalendarController implements Initializable {
 
         for (int i = 0; i < 6; i++) {
 
-            for (int j = 1; j < 7; j++) {
+            for (int j = 0; j < 7; j++) {
 
                 StackPane pane = new StackPane();
 
@@ -101,7 +100,7 @@ public class MainCalendarController implements Initializable {
 
                         List<CalendarActivity> activity_list = null;
                         try {
-                            activity_list = events.get(date_for_getting.toLocalDate());
+                            activity_list = events.get(date_for_getting.toLocalDate().minusDays(day_of_week_start));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -176,19 +175,26 @@ public class MainCalendarController implements Initializable {
 
         try {
 
-            LocalDate event_localdate = LocalDate.parse(event_datepicker.getValue().toString());
-            ZonedDateTime event_date = event_localdate.atStartOfDay(ZoneId.systemDefault());
+            LocalDate event_start_localdate = LocalDate.parse(event_start_datepicker.getValue().toString());
+            ZonedDateTime event_start_date = event_start_localdate.atStartOfDay(ZoneId.systemDefault());
+
+            LocalDate event_end_localdate = LocalDate.parse(event_end_datepicker.getValue().toString());
+            ZonedDateTime event_end_date = event_end_localdate.atStartOfDay(ZoneId.systemDefault());
 
             String event_name = event_name_field.getText();
+            String event_description = event_description_field.getText();
 
-            if (event_name.isEmpty()) event_name = "Bruh";
+            if (event_name.isEmpty()) {
+                Random rand = new Random();
+                int random_number = rand.nextInt(1000) + 1;
+                event_name = String.valueOf(random_number);
+            };
 
-            CalendarActivity activity = new CalendarActivity(event_name, "Bruh", event_date);
+            CalendarActivity activity = new CalendarActivity(event_name, event_description, event_start_date);
             activities_list.add(activity);
-//            events.put(activity.get_start_date().toLocalDate(), List.of(activity));
             events = create_map(activities_list);
         } catch (Exception e) {
-            System.out.println("Invalid date: " + event_datepicker.getValue().toString());
+            System.out.println("Invalid date: " + event_start_datepicker.getValue().toString());
         }
 
         System.out.println(events);

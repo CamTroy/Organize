@@ -12,7 +12,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stellar.organize.MainCalendarController">
    <children>
-      <FlowPane fx:id="month_flowpane" layoutX="186.0" layoutY="86.0" prefHeight="600.0" prefWidth="800.0" />
+      <FlowPane fx:id="month_flowpane" hgap="10.0" layoutX="186.0" layoutY="86.0" prefHeight="600.0" prefWidth="800.0" vgap="5.0" />
       <HBox layoutX="329.0" layoutY="14.0" prefHeight="60.0" prefWidth="342.0">
          <children>
             <Button fx:id="prev_month_button" mnemonicParsing="false" onAction="#go_to_prev_month" prefHeight="60.0" prefWidth="100.0" text="Previous" />
@@ -26,8 +26,10 @@
             <Font size="16.0" />
          </font>
       </CheckBox>
-      <DatePicker fx:id="event_datepicker" layoutX="14.0" layoutY="86.0" prefHeight="25.0" prefWidth="155.0" />
-      <Button fx:id="create_event_button" layoutX="14.0" layoutY="117.0" mnemonicParsing="false" onAction="#create_event" prefHeight="31.0" prefWidth="155.0" text="Create" />
+      <DatePicker fx:id="event_start_datepicker" layoutX="14.0" layoutY="137.0" prefHeight="25.0" prefWidth="155.0" promptText="Start date" />
+      <Button fx:id="create_event_button" layoutX="14.0" layoutY="207.0" mnemonicParsing="false" onAction="#create_event" prefHeight="31.0" prefWidth="155.0" text="Create" />
       <TextField fx:id="event_name_field" layoutX="14.0" layoutY="50.0" prefHeight="25.0" prefWidth="155.0" promptText="Event name" />
+      <TextField fx:id="event_description_field" layoutX="14.0" layoutY="86.0" prefHeight="25.0" prefWidth="155.0" promptText="Event description" />
+      <DatePicker fx:id="event_end_datepicker" layoutX="14.0" layoutY="171.0" prefHeight="25.0" prefWidth="155.0" promptText="End date" />
    </children>
 </AnchorPane>
