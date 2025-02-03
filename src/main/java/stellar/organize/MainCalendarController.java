@@ -70,6 +70,10 @@ public class MainCalendarController implements Initializable {
 
         int amount_of_days = date_focus.getMonth().maxLength();
 
+        if(date_focus.getYear() % 4 != 0 && amount_of_days == 29){
+            amount_of_days = 28;
+        }
+
         int day_of_week_start = ZonedDateTime.of(date_focus.getYear(), date_focus.getMonthValue(), 1, 0, 0, 0, 0, date_focus.getZone()).getDayOfWeek().getValue();
         ZonedDateTime date_for_getting = ZonedDateTime.of(2025, date_focus.getMonthValue(), 1, 0, 0, 0, 0, date_focus.getZone());
 
@@ -110,7 +114,7 @@ public class MainCalendarController implements Initializable {
                         }
                     }
                 }
-                System.out.println(date_for_getting);
+//                System.out.println(date_for_getting);
                 date_for_getting = date_for_getting.plusDays(1);
                 month_flowpane.getChildren().add(pane);
             }
@@ -137,6 +141,8 @@ public class MainCalendarController implements Initializable {
                 System.out.println(text.getText());
 
                 for (int j = 0; j < activity_list.size(); j++) {
+                    // && activities_list.get(j).get_start_date().equals(activity_list.get(j).get_start_date())
+                    // Gonna work on this later.
                     if (activities_list.get(j).get_title().equals(title)) {
                         System.out.println("Found!");
                         activities_list.remove(activities_list.get(j));
@@ -190,7 +196,11 @@ public class MainCalendarController implements Initializable {
                 event_name = String.valueOf(random_number);
             };
 
-            CalendarActivity activity = new CalendarActivity(event_name, event_description, event_start_date);
+            if (event_end_date == null) {
+                event_end_date = event_start_date;
+            }
+
+            CalendarActivity activity = new CalendarActivity(event_name, event_description, event_start_date, event_end_date);
             activities_list.add(activity);
             events = create_map(activities_list);
         } catch (Exception e) {
@@ -205,12 +215,21 @@ public class MainCalendarController implements Initializable {
 
         Map<LocalDate, List<CalendarActivity>> event_map = new HashMap<>();
 
+        // This is an ugly function, I'm sorry to anyone who has to look at this 🫥
+        // Also thanks to https://www.baeldung.com/java-between-dates
         for (CalendarActivity activity : activities) {
 
-            if (event_map.containsKey(activity.get_start_date().toLocalDate())) {
-                event_map.get(activity.get_start_date().toLocalDate()).add(activity);
-            } else {
-                event_map.put(activity.get_start_date().toLocalDate(), List.of(activity));
+            List<ZonedDateTime> event_dates = new ArrayList<>();
+            ZonedDateTime iterative_date = activity.get_start_date();
+
+            while (iterative_date.isBefore(activity.get_end_date()) || iterative_date.isEqual(activity.get_end_date())) {
+
+                if (!(event_map.containsKey(iterative_date.toLocalDate()))) {
+                    event_map.put(iterative_date.toLocalDate(), new ArrayList<>());
+                }
+
+                event_map.get(iterative_date.toLocalDate()).add(activity);
+                iterative_date = iterative_date.plusDays(1);
             }
         }
 

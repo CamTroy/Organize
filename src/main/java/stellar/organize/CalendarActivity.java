@@ -1,5 +1,6 @@
 package stellar.organize;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 public class CalendarActivity {
@@ -7,6 +8,8 @@ public class CalendarActivity {
     private String description;
     private ZonedDateTime start_date;
     private ZonedDateTime end_date;
+    private LocalTime start_time;
+    private LocalTime end_time;
 
     public CalendarActivity(String title, String description, ZonedDateTime start_date) {
         this.title = title;
@@ -40,6 +43,14 @@ public class CalendarActivity {
         return end_date;
     }
 
+    public LocalTime get_start_time() {
+        return start_time;
+    }
+
+    public LocalTime get_end_time() {
+        return end_time;
+    }
+
     public void set_title(String title) {
         this.title = title;
     }
@@ -56,10 +67,21 @@ public class CalendarActivity {
         this.end_date = end_date;
     }
 
+    public void set_start_time(LocalTime start_time) {
+        this.start_time = start_time;
+    }
+
+    public void set_end_time(LocalTime end_time) {
+        this.end_time = end_time;
+    }
+
     @Override
     public String toString() {
         return "title = '" + title + '\n' +
                 "description = " + description + '\n' +
-                "start_date = " + start_date;
+                "start_date = " + start_date + '\n' +
+                "end_date = " + end_date + '\n' +
+                "start_time = " + start_time + '\n' +
+                "end_time = " + end_time;
     }
 }
