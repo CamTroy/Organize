@@ -10,6 +10,9 @@ public class CalendarActivity {
     private ZonedDateTime end_date;
     private LocalTime start_time;
     private LocalTime end_time;
+    private String repeating;
+
+    private final String[] repeating_values = { "Daily", "Weekly", "Monthly", "Yearly" };
 
     public CalendarActivity(String title, String description, ZonedDateTime start_date) {
         this.title = title;
@@ -22,6 +25,25 @@ public class CalendarActivity {
         this.description = description;
         this.start_date = start_date;
         this.end_date = end_date;
+    }
+
+    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date, LocalTime start_time, LocalTime end_time) {
+        this.title = title;
+        this.description = description;
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.start_time = start_time;
+        this.end_time = end_time;
+    }
+
+    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date, LocalTime start_time, LocalTime end_time, String repeating) {
+        this.title = title;
+        this.description = description;
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.start_time = start_time;
+        this.end_time = end_time;
+        this.repeating = repeating;
     }
 
     public CalendarActivity() {
