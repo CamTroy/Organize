@@ -5,9 +5,11 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -18,6 +20,7 @@ import org.controlsfx.control.Notifications;
 
 import java.net.URL;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -30,7 +33,7 @@ public class MainCalendarController implements Initializable {
     private DatePicker event_start_datepicker, event_end_datepicker;
 
     @FXML
-    private CheckBox dnd_checkbox;
+    private CheckBox dnd_checkbox, all_day_checkbox;
 
     @FXML
     private Text year_text, month_text;
@@ -44,6 +47,9 @@ public class MainCalendarController implements Initializable {
     @FXML
     private TimePicker start_time_picker, end_time_picker;
 
+    @FXML
+    private ChoiceBox<String> repeating_choice_box;
+
     ZonedDateTime date_focus, today;
 
     boolean do_not_disturb = false;
@@ -54,6 +60,10 @@ public class MainCalendarController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle bundle) {
 
+        String[] choice_box_choices = {"Daily", "Weekly", "Monthly", "Yearly", "None"};
+        repeating_choice_box.getItems().addAll(choice_box_choices);
+        repeating_choice_box.setValue(choice_box_choices[4]);
+
         date_focus = ZonedDateTime.now();
         today = ZonedDateTime.now();
         make_month();
@@ -62,6 +72,7 @@ public class MainCalendarController implements Initializable {
     // A lot of this code was created with the help of this video: https://www.youtube.com/watch?v=tlomjP5uvqo
     private void make_month() {
 
+        events = create_map(activities_list, date_focus.toLocalDate());
         month_flowpane.getChildren().clear();
         year_text.setText(String.valueOf(date_focus.getYear()));
         month_text.setText(date_focus.getMonth().toString());
@@ -116,6 +127,12 @@ public class MainCalendarController implements Initializable {
                         if (activity_list != null) {
                             create_event_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
                         }
+
+                        for (CalendarActivity activity : activities_list) {
+                            if (activity.get_repeating() != null) {
+
+                            }
+                        }
                     }
                 }
                 date_for_getting = date_for_getting.plusDays(1);
@@ -141,6 +158,7 @@ public class MainCalendarController implements Initializable {
         System.out.println(activity_list.size());
         VBox activity_vbox = new VBox();
         for (int i = 0; i < activity_list.size(); i++) {
+
             if (i >= 1) {
                 Text moreActivities = new Text("...");
                 activity_vbox.getChildren().add(moreActivities);
@@ -150,11 +168,12 @@ public class MainCalendarController implements Initializable {
                 break;
             }
             String title = activity_list.get(i).get_title();
-            String description = activity_list.get(i).get_description();
-            Text text = new Text(title + "\n"
-                    + description + "\n"
-                    + activity_list.get(i).get_start_time() + "\n"
-                    + activity_list.get(i).get_end_time() + "\n");
+//            String description = activity_list.get(i).get_description();
+//            Text text = new Text(title + "\n"
+//                    + description + "\n"
+//                    + activity_list.get(i).get_start_time() + "\n"
+//                    + activity_list.get(i).get_end_time() + "\n");
+            Text text = new Text(title);
             activity_vbox.getChildren().add(text);
             text.setOnMouseClicked(mouseEvent -> {
                 System.out.println(text.getText());
@@ -165,15 +184,17 @@ public class MainCalendarController implements Initializable {
                     if (activities_list.get(j).get_title().equals(title)) {
                         System.out.println("Found!");
                         activities_list.remove(activities_list.get(j));
-                        events = create_map(activities_list);
+                        events = create_map(activities_list, date_focus.toLocalDate());
                         make_month();
                     }
                 }
             });
         }
-        activity_vbox.setTranslateY((rectangle_height / 2) * 0.20);
+
+        StackPane.setAlignment(activity_vbox, Pos.TOP_CENTER);
+        activity_vbox.setTranslateY(rectangle_height / 10);
         activity_vbox.setMaxWidth(rectangle_width * 0.8);
-        activity_vbox.setMaxHeight(rectangle_height * 0.65);
+        activity_vbox.setMaxHeight(rectangle_height * 0.1);
         activity_vbox.setStyle("-fx-background-color:#a6a6ff");
         pane.getChildren().add(activity_vbox);
     }
@@ -210,33 +231,35 @@ public class MainCalendarController implements Initializable {
         LocalTime event_start_time = start_time_picker.getTime();
         LocalTime event_end_time = end_time_picker.getTime();
 
+        String repeating = repeating_choice_box.getSelectionModel().getSelectedItem();
+
         if (event_name.isEmpty()) {
+
             Random rand = new Random();
-            int random_number = rand.nextInt(1000) + 1;
+            int random_number = rand.nextInt(100000) + 1;
             event_name = String.valueOf(random_number);
         }
-        ;
 
         if ((end_time_picker.getTime() == null && start_time_picker.getTime() != null)) {
             event_end_time = event_start_time;
         }
 
-        if (event_end_date.isBefore(event_start_date) || end_time_picker.getValue() == null) {
+        if (event_end_date.isBefore(event_start_date) || event_end_datepicker.getValue() == null) {
             event_end_date = event_start_date;
         }
 
         CalendarActivity activity;
 
-        activity = new CalendarActivity(event_name, event_description, event_start_date, event_end_date, event_start_time, event_end_time);
+        activity = new CalendarActivity(event_name, event_description, event_start_date, event_end_date, event_start_time, event_end_time, repeating);
 
         activities_list.add(activity);
-        events = create_map(activities_list);
+        events = create_map(activities_list, date_focus.toLocalDate());
 
         System.out.println(events);
         make_month();
     }
 
-    private Map<LocalDate, List<CalendarActivity>> create_map(List<CalendarActivity> activities) {
+    private Map<LocalDate, List<CalendarActivity>> create_map(List<CalendarActivity> activities, LocalDate date) {
 
         Map<LocalDate, List<CalendarActivity>> event_map = new HashMap<>();
 
@@ -245,17 +268,57 @@ public class MainCalendarController implements Initializable {
         for (CalendarActivity activity : activities) {
 
             List<ZonedDateTime> event_dates = new ArrayList<>();
-            ZonedDateTime iterative_date = activity.get_start_date();
+            LocalDate iterative_date = activity.get_start_date().toLocalDate();
 
-            while (iterative_date.isBefore(activity.get_end_date()) || iterative_date.isEqual(activity.get_end_date())) {
+            while (iterative_date.isBefore(activity.get_end_date().toLocalDate()) || iterative_date.isEqual(activity.get_end_date().toLocalDate())) {
 
-                if (!(event_map.containsKey(iterative_date.toLocalDate()))) {
-                    event_map.put(iterative_date.toLocalDate(), new ArrayList<>());
+                // Create the Key if it doesn't already exist.
+                if (!(event_map.containsKey(iterative_date))) {
+                    event_map.put(iterative_date, new ArrayList<>());
                 }
 
-                event_map.get(iterative_date.toLocalDate()).add(activity);
+                event_map.get(iterative_date).add(activity);
+
                 iterative_date = iterative_date.plusDays(1);
             }
+
+            event_map = setup_repeating_events(event_map, activity, date);
+        }
+
+        return event_map;
+    }
+
+    private Map<LocalDate, List<CalendarActivity>> setup_repeating_events(Map<LocalDate, List<CalendarActivity>> event_map, CalendarActivity activity, LocalDate date) {
+
+        if (event_map == null) {
+            event_map = new HashMap<>();
+        }
+
+        /* Things that need to happen here:
+        Get every day of the month and loop through them all.
+        Repeating events, check for daily and weekly.
+        After that, work on monthly and yearly.
+         */
+        LocalDate current_date = date.withDayOfMonth(1);
+        int days_in_month = current_date.getMonth().length(current_date.isLeapYear());
+
+        for (int i = 1; i <= days_in_month; i++) {
+
+            if (activity.get_repeating().equals("Daily")
+                    && !activity.get_start_date().toLocalDate().isAfter(current_date)
+                    && ChronoUnit.DAYS.between(activity.get_start_date().toLocalDate(), current_date) >= 1) {
+
+                event_map.computeIfAbsent(current_date, k -> new ArrayList<>()).add(activity);
+            }
+
+            if (activity.get_repeating().equals("Weekly")
+                    && ChronoUnit.DAYS.between(activity.get_start_date().toLocalDate(), current_date) >= 1
+                    && ChronoUnit.DAYS.between(activity.get_start_date().toLocalDate(), current_date) % 7 == 0) {
+
+                event_map.computeIfAbsent(current_date, k -> new ArrayList<>()).add(activity);
+            }
+
+            current_date = current_date.plusDays(1);
         }
 
         return event_map;
@@ -263,6 +326,7 @@ public class MainCalendarController implements Initializable {
 
     private void schedule_task(LocalDateTime target_date_time, Runnable task) {
 
+        // I don't think this is very optimized, but I honestly don't care very much.
         LocalDateTime now = LocalDateTime.now();
 
         long delay = java.time.Duration.between(now, target_date_time).toMillis();
@@ -280,19 +344,37 @@ public class MainCalendarController implements Initializable {
         }, delay, TimeUnit.MILLISECONDS);
     }
 
+    private void schedule_repeating_task(CalendarActivity activity, LocalDateTime target_date_time, Runnable task) {
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        long initialDelay = calculate_initial_delay(target_date_time);
+        long period = TimeUnit.DAYS.toSeconds(1);
+
+        scheduler.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.SECONDS);
+    }
+
+    private long calculate_initial_delay(LocalDateTime target_date_time) {
+
+        LocalDateTime now = LocalDateTime.now();
+        return java.time.Duration.between(now, target_date_time).getSeconds();
+    }
+
     private void send_notification(CalendarActivity activity) {
 
         if (do_not_disturb) return;
 
         System.out.println("Sending notification!");
         Platform.runLater(() -> {
-                Notifications notifications = Notifications.create()
-                .title(activity.get_title())
-                .text(activity.get_description())
-                .graphic(null)
-                .hideAfter(Duration.seconds(5))
-                .position(Pos.TOP_CENTER);
-        notifications.show();
+            Notifications notifications = Notifications.create().title(activity.get_title()).text(activity.get_description()).graphic(null).hideAfter(Duration.seconds(5)).position(Pos.TOP_CENTER);
+            notifications.show();
         });
+    }
+
+    public void set_all_day(ActionEvent event) {
+
+        boolean all_day = !(all_day_checkbox.isSelected());
+        start_time_picker.setVisible(all_day);
+        end_time_picker.setVisible(all_day);
     }
 }

@@ -12,7 +12,7 @@ public class CalendarActivity {
     private LocalTime end_time;
     private String repeating;
 
-    private final String[] repeating_values = { "Daily", "Weekly", "Monthly", "Yearly" };
+    private final String[] repeating_values = { "Daily", "Weekly", "Monthly", "Yearly", "None" };
 
     public CalendarActivity(String title, String description, ZonedDateTime start_date) {
         this.title = title;
@@ -73,6 +73,10 @@ public class CalendarActivity {
         return end_time;
     }
 
+    public String get_repeating() {
+        return repeating;
+    }
+
     public void set_title(String title) {
         this.title = title;
     }
@@ -97,6 +101,10 @@ public class CalendarActivity {
         this.end_time = end_time;
     }
 
+    public void set_repeating(String repeating) {
+        this.repeating = repeating;
+    }
+
     @Override
     public String toString() {
         return "title = '" + title + '\n' +
@@ -104,6 +112,7 @@ public class CalendarActivity {
                 "start_date = " + start_date + '\n' +
                 "end_date = " + end_date + '\n' +
                 "start_time = " + start_time + '\n' +
-                "end_time = " + end_time;
+                "end_time = " + end_time + '\n' +
+                "repeating = " + repeating;
     }
 }
