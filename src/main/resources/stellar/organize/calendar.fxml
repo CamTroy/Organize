@@ -30,5 +30,6 @@
       <TimePicker fx:id="end_time_picker" layoutX="49.0" layoutY="171.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="28.0" prefWidth="85.0" />
       <ChoiceBox fx:id="repeating_choice_box" layoutX="17.0" layoutY="337.0" prefWidth="150.0" />
       <CheckBox fx:id="all_day_checkbox" layoutX="17.0" layoutY="375.0" mnemonicParsing="false" onAction="#set_all_day" text="All day" />
+      <TextField fx:id="location_text_field" layoutX="11.0" layoutY="416.0" promptText="Location" />
    </children>
 </AnchorPane>
