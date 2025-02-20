@@ -1,23 +1,32 @@
 package stellar.organize;
 
-import com.dlsc.gemsfx.TimePicker;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -27,13 +36,10 @@ import java.util.concurrent.*;
 public class MainCalendarController implements Initializable {
 
     @FXML
-    private Button create_event_button, prev_month_button, next_month_button;
+    private Button create_event_button, prev_month_button, next_month_button, today_button;
 
     @FXML
-    private DatePicker event_start_datepicker, event_end_datepicker;
-
-    @FXML
-    private CheckBox dnd_checkbox, all_day_checkbox;
+    private CheckBox dnd_checkbox;
 
     @FXML
     private Text year_text, month_text;
@@ -41,28 +47,15 @@ public class MainCalendarController implements Initializable {
     @FXML
     private FlowPane month_flowpane;
 
-    @FXML
-    private TextField event_name_field, event_description_field, location_text_field;
-
-    @FXML
-    private TimePicker start_time_picker, end_time_picker;
-
-    @FXML
-    private ChoiceBox<String> repeating_choice_box;
-
     ZonedDateTime date_focus, today;
 
-    boolean do_not_disturb = false;
+    boolean do_not_disturb;
 
-    List<CalendarActivity> activities_list = new ArrayList<>();
-    Map<LocalDate, List<CalendarActivity>> events = new HashMap<>();
+    public static List<CalendarActivity> activity_list = new ArrayList<>();
+    Map<LocalDate, List<CalendarActivity>> activity_map = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle bundle) {
-
-        String[] choice_box_choices = {"Daily", "Weekly", "Monthly", "Yearly", "None"};
-        repeating_choice_box.getItems().addAll(choice_box_choices);
-        repeating_choice_box.setValue(choice_box_choices[4]);
 
         date_focus = ZonedDateTime.now();
         today = ZonedDateTime.now();
@@ -70,9 +63,9 @@ public class MainCalendarController implements Initializable {
     }
 
     // A lot of this code was created with the help of this video: https://www.youtube.com/watch?v=tlomjP5uvqo
-    private void make_month() {
+    public void make_month() {
 
-        events = create_map(activities_list, date_focus.toLocalDate());
+        activity_map = create_map(activity_list, date_focus.toLocalDate());
         month_flowpane.getChildren().clear();
         year_text.setText(String.valueOf(date_focus.getYear()));
         month_text.setText(date_focus.getMonth().toString());
@@ -119,13 +112,13 @@ public class MainCalendarController implements Initializable {
 
                         List<CalendarActivity> activity_list = null;
                         try {
-                            activity_list = events.get(date_for_getting.toLocalDate().minusDays(day_of_week_start));
+                            activity_list = activity_map.get(date_for_getting.toLocalDate().minusDays(day_of_week_start));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
                         if (activity_list != null) {
-                            create_event_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
+                            create_activity_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
                         }
 
                         /*for (CalendarActivity activity : activities_list) {
@@ -134,6 +127,11 @@ public class MainCalendarController implements Initializable {
                             }
                         }*/
                     }
+
+                    pane.setOnMouseClicked(event -> {
+
+                        open_activity_viewer(event, true_date, date_focus.toLocalDate());
+                    });
                 }
                 date_for_getting = date_for_getting.plusDays(1);
                 month_flowpane.getChildren().add(pane);
@@ -141,7 +139,7 @@ public class MainCalendarController implements Initializable {
         }
     }
 
-    private void create_event_on_calendar(List<CalendarActivity> activity_list, double rectangle_height, double rectangle_width, StackPane pane) {
+    public void create_activity_on_calendar(List<CalendarActivity> activity_list, double rectangle_height, double rectangle_width, StackPane pane) {
 
         System.out.println(activity_list.size());
         VBox activity_vbox = new VBox();
@@ -169,10 +167,10 @@ public class MainCalendarController implements Initializable {
                 for (int j = 0; j < activity_list.size(); j++) {
                     // && activities_list.get(j).get_start_date().equals(activity_list.get(j).get_start_date())
                     // Gonna work on this later.
-                    if (activities_list.get(j).get_title().equals(title)) {
+                    if (this.activity_list.get(j).get_title().equals(title)) {
                         System.out.println("Found!");
-                        activities_list.remove(activities_list.get(j));
-                        events = create_map(activities_list, date_focus.toLocalDate());
+                        this.activity_list.remove(this.activity_list.get(j));
+                        activity_map = create_map(this.activity_list, date_focus.toLocalDate());
                         make_month();
                     }
                 }
@@ -197,7 +195,7 @@ public class MainCalendarController implements Initializable {
         make_month();
     }
 
-    public void display_events() {
+    public void display_activity() {
 
     }
 
@@ -205,81 +203,7 @@ public class MainCalendarController implements Initializable {
         do_not_disturb = dnd_checkbox.isSelected();
     }
 
-    public void create_event(ActionEvent event) {
-
-        if (event_start_datepicker.getValue() == null ||
-                event_end_datepicker.getValue() == null ||
-                event_name_field.getText() == null || event_name_field.getText().trim().isEmpty() ||
-                event_description_field.getText() == null || event_description_field.getText().trim().isEmpty() ||
-                start_time_picker.getTime() == null ||
-                end_time_picker.getTime() == null ||
-                repeating_choice_box.getSelectionModel().getSelectedItem() == null) {
-            return;
-        }
-
-        LocalDate event_start_localdate = LocalDate.parse(event_start_datepicker.getValue().toString());
-        ZonedDateTime event_start_date = event_start_localdate.atStartOfDay(ZoneId.systemDefault());
-
-        LocalDate event_end_localdate = LocalDate.parse(event_end_datepicker.getValue().toString());
-        ZonedDateTime event_end_date = event_end_localdate.atStartOfDay(ZoneId.systemDefault());
-
-        String event_name = event_name_field.getText();
-        String event_description = event_description_field.getText();
-
-        LocalTime event_start_time = start_time_picker.getTime();
-        LocalTime event_end_time = end_time_picker.getTime();
-
-        String location = "";
-
-        if (!(location_text_field.getText() == null || location_text_field.getText().trim().isEmpty())) {
-            location = location_text_field.getText();
-        }
-
-        String repeating = repeating_choice_box.getSelectionModel().getSelectedItem();
-
-        if (event_name.isEmpty()) {
-
-            Random rand = new Random();
-            int random_number = rand.nextInt(100000) + 1;
-            event_name = String.valueOf(random_number);
-        }
-
-        if (event_end_time.isBefore(event_start_time)) {
-            event_end_time = event_start_time.plusMinutes(15);
-        }
-
-        if (event_end_date.isBefore(event_start_date)) {
-            event_end_date = event_start_date;
-        }
-
-        CalendarActivity activity;
-
-        activity = new CalendarActivity(event_name, event_description, event_start_date, event_end_date, event_start_time, event_end_time, repeating, location);
-
-        activities_list.add(activity);
-        events = create_map(activities_list, date_focus.toLocalDate());
-
-        System.out.println(events);
-
-        LocalDate local_date_bruh = LocalDate.from(activity.get_start_date());
-        LocalTime local_time_bruh = LocalTime.from(activity.get_start_time());
-
-        LocalDateTime target_date_time = LocalDateTime.of(local_date_bruh, local_time_bruh);
-
-        if (!(activity.get_repeating().equals("None"))) {
-            schedule_repeating_task(activity, target_date_time, () -> {
-                send_notification(activity);
-            });
-        } else {
-            schedule_task(target_date_time, () -> {
-                send_notification(activity);
-            });
-        }
-
-        make_month();
-    }
-
-    private Map<LocalDate, List<CalendarActivity>> create_map(List<CalendarActivity> activities, LocalDate date) {
+    public Map<LocalDate, List<CalendarActivity>> create_map(List<CalendarActivity> activities, LocalDate date) {
 
         Map<LocalDate, List<CalendarActivity>> event_map = new HashMap<>();
 
@@ -302,13 +226,13 @@ public class MainCalendarController implements Initializable {
                 iterative_date = iterative_date.plusDays(1);
             }
 
-            event_map = setup_repeating_events(event_map, activity, date);
+            event_map = setup_repeating_activities(event_map, activity, date);
         }
 
         return event_map;
     }
 
-    private Map<LocalDate, List<CalendarActivity>> setup_repeating_events(Map<LocalDate, List<CalendarActivity>> event_map, CalendarActivity activity, LocalDate date) {
+    public Map<LocalDate, List<CalendarActivity>> setup_repeating_activities(Map<LocalDate, List<CalendarActivity>> event_map, CalendarActivity activity, LocalDate date) {
 
         if (event_map == null) {
             event_map = new HashMap<>();
@@ -352,7 +276,7 @@ public class MainCalendarController implements Initializable {
         return event_map;
     }
 
-    private void schedule_task(LocalDateTime target_date_time, Runnable task) {
+    public void schedule_task(LocalDateTime target_date_time, Runnable task) {
 
         // I don't think this is very optimized, but I honestly don't care very much.
         LocalDateTime now = LocalDateTime.now();
@@ -372,7 +296,7 @@ public class MainCalendarController implements Initializable {
         }, delay, TimeUnit.MILLISECONDS);
     }
 
-    private void schedule_repeating_task(CalendarActivity activity, LocalDateTime target_date_time, Runnable task) {
+    protected void schedule_repeating_task(CalendarActivity activity, LocalDateTime target_date_time, Runnable task) {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         long initialDelay = calculate_initial_delay(target_date_time);
@@ -408,13 +332,13 @@ public class MainCalendarController implements Initializable {
         return current_date.getDayOfMonth() == target_day;
     }
 
-    private long calculate_initial_delay(LocalDateTime target_date_time) {
+    protected long calculate_initial_delay(LocalDateTime target_date_time) {
         LocalDateTime now = LocalDateTime.now();
         return java.time.Duration.between(now, target_date_time).getSeconds();
     }
 
 
-    private void send_notification(CalendarActivity activity) {
+    protected void send_notification(CalendarActivity activity) {
 
         if (do_not_disturb) return;
 
@@ -425,10 +349,78 @@ public class MainCalendarController implements Initializable {
         });
     }
 
-    public void set_all_day(ActionEvent event) {
+    public void open_activity_viewer(Event event, int day_of_month, LocalDate date_focus) {
 
-        boolean all_day = !(all_day_checkbox.isSelected());
-        start_time_picker.setVisible(all_day);
-        end_time_picker.setVisible(all_day);
+        try {
+
+            FXMLLoader fxml_loader = new FXMLLoader(getClass().getResource("activity_viewer.fxml"));
+            Parent root1 = fxml_loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+            ActivityViewerController event_viewer_controller = fxml_loader.getController();
+            event_viewer_controller.set_MainCalendarController(this);
+
+            LocalDate date = date_focus.withDayOfMonth(day_of_month);
+            List<CalendarActivity> activity_list = activity_map.get(date);
+
+            event_viewer_controller.list_activities_in_vbox(date, activity_list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void bring_to_today (Event event) {
+
+        date_focus = today;
+        make_month();
+    }
+
+    public void write_to_file(String path, List<CalendarActivity> activity_list) throws IOException {
+
+        System.out.println("Writing to: " + path);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        new FileWriter(path, false).close();
+        File file = new File(path);
+        String JSON_string = "";
+
+        for (CalendarActivity activity : activity_list) {
+            mapper.writeValue(file, activity);
+        }
+
+        System.out.println("Done writing to: " + path);
+    }
+
+    private List<CalendarActivity> read_from_file(String path) throws IOException {
+
+        if (new File(path).exists()) {
+            return new ArrayList<>();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = new FileReader(new File(path)).toString();
+
+        return mapper.readValue(json, new TypeReference<List<CalendarActivity>>(){});
+    }
+
+    public void open_activity_creator(ActionEvent event) {
+
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("activity_creator.fxml"));
+            Parent root2 = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root2));
+            stage.show();
+
+            ActivityCreatorController creator_controller = loader.getController();
+            creator_controller.set_MainCalendarController(this);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

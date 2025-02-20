@@ -1,9 +1,12 @@
 package stellar.organize;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 public class CalendarActivity {
+
     private String title;
     private String description;
     private ZonedDateTime start_date;
@@ -13,7 +16,7 @@ public class CalendarActivity {
     private String repeating;
     private String location;
 
-    private final String[] repeating_values = { "Daily", "Weekly", "Monthly", "Yearly", "None" };
+    private final String[] repeating_values = {"Daily", "Weekly", "Monthly", "Yearly", "None"};
 
     public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date) {
         this.title = title;
@@ -116,6 +119,18 @@ public class CalendarActivity {
 
     public void set_location(String location) {
         this.location = location;
+    }
+
+    public boolean equals(CalendarActivity activity) {
+
+        return this.get_title().equals(activity.get_title())
+                && this.get_description().equals(activity.get_description())
+                && this.get_start_date().equals(activity.get_start_date())
+                && this.get_end_date().equals(activity.get_end_date())
+                && this.get_start_time().equals(activity.get_start_time())
+                && this.get_end_time().equals(activity.get_end_time())
+                && this.get_repeating().equals(activity.get_repeating())
+                && this.get_location().equals(activity.get_location());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package stellar.organize;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -13,6 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class OrganizeApplication extends Application {
+
+    private MainCalendarController calendar_controller;
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(OrganizeApplication.class.getResource("calendar.fxml"));
@@ -25,6 +29,21 @@ public class OrganizeApplication extends Application {
         stage.setWidth(1280);
         stage.setScene(scene);
         stage.show();
+
+        calendar_controller = fxmlLoader.getController();
+
+        stage.setOnCloseRequest(event -> {
+            if (calendar_controller != null) {
+                try {
+                    String activities_path = "activities.json";
+                    calendar_controller.write_to_file(activities_path, calendar_controller.activity_list);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     public static void main(String[] args) {
