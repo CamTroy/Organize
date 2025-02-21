@@ -1,0 +1,44 @@
+.root {
+    -bg-color: #222327;
+    -white: #e2e2e3;
+    -yellow: #e7c664;
+    -green: #9ed072;
+    -orange: #f39660;
+    -purple: #b39df3;
+    -blue: #76cce0;
+    -red: #dc3b5a;
+    -gray_dim: #594f6f;
+    -gray: #7f8490;
+    -gray0: #2c2e34;
+
+    -fx-background-color: -bg-color;
+    -fx-stroke: -white;
+}
+
+.label {
+    -fx-text-fill: -white;
+}
+
+.text {
+    -fx-fill: -white;
+    -fx-text-fill: -white;
+}
+
+.button {
+    -fx-fill: -red;
+    -fx-background-color: -red;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+#prev_month_button, #next_month_button, #today_button {
+    -fx-background-color: -gray0;
+    -fx-border-color: -gray;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+#month_text, #year_text {
+    -fx-fill: -white;
+}
+

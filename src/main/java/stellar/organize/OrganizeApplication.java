@@ -7,11 +7,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class OrganizeApplication extends Application {
 
@@ -21,8 +20,8 @@ public class OrganizeApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(OrganizeApplication.class.getResource("calendar.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-
         Image icon = new Image("icon.jpg");
+
         stage.getIcons().add(icon);
         stage.setTitle("Organize");
         stage.setHeight(800);
@@ -35,8 +34,13 @@ public class OrganizeApplication extends Application {
         stage.setOnCloseRequest(event -> {
             if (calendar_controller != null) {
                 try {
+
                     String activities_path = "activities.json";
-                    calendar_controller.write_to_file(activities_path, calendar_controller.activity_list);
+                    String config_path = "config.json";
+                    List<Boolean> config_options = Collections.singletonList(calendar_controller.do_not_disturb);
+
+                    calendar_controller.write_activities_to_file(activities_path, calendar_controller.activity_list);
+                    calendar_controller.write_config_to_file(config_path, config_options);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

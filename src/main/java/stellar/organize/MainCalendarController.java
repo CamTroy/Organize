@@ -1,5 +1,6 @@
 package stellar.organize;
 
+import com.dlsc.gemsfx.Spacer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -9,6 +10,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,6 +19,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -24,7 +27,6 @@ import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +38,7 @@ import java.util.concurrent.*;
 public class MainCalendarController implements Initializable {
 
     @FXML
-    private Button create_event_button, prev_month_button, next_month_button, today_button;
+    private Button open_creator_button, prev_month_button, next_month_button, today_button;
 
     @FXML
     private CheckBox dnd_checkbox;
@@ -47,18 +49,66 @@ public class MainCalendarController implements Initializable {
     @FXML
     private FlowPane month_flowpane;
 
+    @FXML
+    private VBox week_activity_vbox;
+
     ZonedDateTime date_focus, today;
 
     boolean do_not_disturb;
 
     public static List<CalendarActivity> activity_list = new ArrayList<>();
     Map<LocalDate, List<CalendarActivity>> activity_map = new HashMap<>();
+    List<Boolean> config_options = new ArrayList<>();
+
+    String activities_path = "activities.json";
+    String config_path = "config.json";
 
     @Override
     public void initialize(URL url, ResourceBundle bundle) {
 
         date_focus = ZonedDateTime.now();
         today = ZonedDateTime.now();
+        activity_map = create_map(activity_list, today.toLocalDate());
+
+        try {
+            activity_list = get_activities_from_file(activities_path);
+        } catch (IOException e) {
+            System.out.println("Activities.json does not exist or the file is empty! Ignoring...");
+            e.printStackTrace();
+        }
+
+        System.out.println(activity_list);
+
+        try {
+            config_options = get_config_from_file(config_path);
+        } catch (IOException e) {
+            System.out.println("Config.json does not exist or the file is empty! Ignoring...");
+        }
+
+        if (!config_options.isEmpty()) {
+            do_not_disturb = config_options.get(0);
+        }
+
+        List<CalendarActivity> this_weeks_stuff = new ArrayList<>();
+        ZonedDateTime beginning_of_week = today.with(DayOfWeek.SUNDAY);
+
+        if (today.getDayOfWeek() != DayOfWeek.SUNDAY) {
+
+            beginning_of_week = beginning_of_week.minusWeeks(1);
+        }
+
+        for (int i = 0; i < 7; i++) {
+
+            System.out.println(beginning_of_week);
+            if (activity_map.get(beginning_of_week.toLocalDate()) != null) {
+                this_weeks_stuff.addAll(activity_map.get(beginning_of_week.toLocalDate()));
+            }
+            beginning_of_week = beginning_of_week.plusDays(1);
+        }
+
+        show_week_activities(this_weeks_stuff);
+
+        dnd_checkbox.setSelected(do_not_disturb);
         make_month();
     }
 
@@ -93,7 +143,7 @@ public class MainCalendarController implements Initializable {
 
                 Rectangle rectangle = new Rectangle();
                 rectangle.setFill(Color.TRANSPARENT);
-                rectangle.setStroke(Color.BLACK);
+                rectangle.setStroke(Paint.valueOf("#594f6f"));
                 rectangle.setStrokeWidth(stroke_width);
                 double rectangle_width = (month_width / 7) - stroke_width - spacing_h;
                 rectangle.setWidth(rectangle_width);
@@ -109,6 +159,9 @@ public class MainCalendarController implements Initializable {
 
                         Text day = new Text(String.valueOf(true_date));
                         pane.getChildren().add(day);
+                        day.setFill(Paint.valueOf("#7f8490"));
+                        StackPane.setAlignment(day, Pos.TOP_LEFT);
+                        StackPane.setMargin(day, new Insets(10, 0, 0, 10));
 
                         List<CalendarActivity> activity_list = null;
                         try {
@@ -120,12 +173,6 @@ public class MainCalendarController implements Initializable {
                         if (activity_list != null) {
                             create_activity_on_calendar(activity_list, rectangle_height, rectangle_width, pane);
                         }
-
-                        /*for (CalendarActivity activity : activities_list) {
-                            if (activity.get_repeating() != null) {
-
-                            }
-                        }*/
                     }
 
                     pane.setOnMouseClicked(event -> {
@@ -154,30 +201,14 @@ public class MainCalendarController implements Initializable {
                 break;
             }
             String title = activity_list.get(i).get_title();
-//            String description = activity_list.get(i).get_description();
-//            Text text = new Text(title + "\n"
-//                    + description + "\n"
-//                    + activity_list.get(i).get_start_time() + "\n"
-//                    + activity_list.get(i).get_end_time() + "\n");
             Text text = new Text(title);
             activity_vbox.getChildren().add(text);
             text.setOnMouseClicked(mouseEvent -> {
                 System.out.println(text.getText());
-
-                for (int j = 0; j < activity_list.size(); j++) {
-                    // && activities_list.get(j).get_start_date().equals(activity_list.get(j).get_start_date())
-                    // Gonna work on this later.
-                    if (this.activity_list.get(j).get_title().equals(title)) {
-                        System.out.println("Found!");
-                        this.activity_list.remove(this.activity_list.get(j));
-                        activity_map = create_map(this.activity_list, date_focus.toLocalDate());
-                        make_month();
-                    }
-                }
             });
         }
 
-        StackPane.setAlignment(activity_vbox, Pos.TOP_CENTER);
+        StackPane.setAlignment(activity_vbox, Pos.CENTER);
         activity_vbox.setTranslateY(rectangle_height / 10);
         activity_vbox.setMaxWidth(rectangle_width * 0.8);
         activity_vbox.setMaxHeight(rectangle_height * 0.1);
@@ -377,7 +408,7 @@ public class MainCalendarController implements Initializable {
         make_month();
     }
 
-    public void write_to_file(String path, List<CalendarActivity> activity_list) throws IOException {
+    public void write_activities_to_file(String path, List<CalendarActivity> activity_list) throws IOException {
 
         System.out.println("Writing to: " + path);
         ObjectMapper mapper = new ObjectMapper();
@@ -387,23 +418,43 @@ public class MainCalendarController implements Initializable {
         File file = new File(path);
         String JSON_string = "";
 
-        for (CalendarActivity activity : activity_list) {
-            mapper.writeValue(file, activity);
-        }
+        mapper.writeValue(file, activity_list);
 
         System.out.println("Done writing to: " + path);
     }
 
-    private List<CalendarActivity> read_from_file(String path) throws IOException {
+    public void write_config_to_file(String path, List<Boolean> configurations) throws IOException {
 
-        if (new File(path).exists()) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        new FileWriter(path, false).close();
+        File file = new File(path);
+        String JSON_string = "";
+
+        mapper.writeValue(file, configurations);
+    }
+
+    private List<CalendarActivity> get_activities_from_file(String path) throws IOException {
+
+        if (!(new File(path).exists())) {
             return new ArrayList<>();
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        String json = new FileReader(new File(path)).toString();
+        mapper.registerModule(new JavaTimeModule());
 
-        return mapper.readValue(json, new TypeReference<List<CalendarActivity>>(){});
+        return mapper.readValue(new File(path), new TypeReference<List<CalendarActivity>>(){});
+    }
+
+    private List<Boolean> get_config_from_file(String path) throws IOException {
+
+        if (!(new File(path).exists())) {
+            return new ArrayList<>();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        return mapper.readValue(new File(path), List.class);
     }
 
     public void open_activity_creator(ActionEvent event) {
@@ -418,9 +469,30 @@ public class MainCalendarController implements Initializable {
 
             ActivityCreatorController creator_controller = loader.getController();
             creator_controller.set_MainCalendarController(this);
-
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void show_week_activities(List<CalendarActivity> activity_list) {
+
+        if (activity_list == null || activity_list.isEmpty()) return;
+
+        week_activity_vbox.getChildren().clear();
+        for (CalendarActivity activity : activity_list) {
+
+            System.out.println(activity);
+            Text name = new Text(activity.get_title());
+            Text description = new Text(activity.get_description());
+            Spacer spacer = new Spacer();
+            spacer.setMaxHeight(20);
+
+            name.setFill(Color.valueOf("e2e2e3"));
+            description.setFill(Color.valueOf("e2e2e3"));
+
+            week_activity_vbox.getChildren().add(name);
+            week_activity_vbox.getChildren().add(description);
+            week_activity_vbox.getChildren().add(spacer);
         }
     }
 }
