@@ -1,9 +1,13 @@
 package stellar.organize;
 
+import com.dlsc.gemsfx.Spacer;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -15,7 +19,10 @@ import java.util.ResourceBundle;
 public class ActivityViewerController extends MainCalendarController {
 
     @FXML
-    private VBox list_vbox;
+    private ListView<VBox> list_view;
+
+    @FXML
+    private ScrollPane scroll_pane;
 
     private MainCalendarController main_calendar_controller;
 
@@ -30,30 +37,64 @@ public class ActivityViewerController extends MainCalendarController {
         this.main_calendar_controller = main_calendar_controller;
     }
 
-    public void list_activities_in_vbox(LocalDate date, List<CalendarActivity> activity_list) {
-        list_vbox.getChildren().clear();
+    public void list_activities_in_vbox(LocalDate date, List<CalendarActivity> activity_list) throws NullPointerException{
+        list_view.getItems().clear();
 
         for (CalendarActivity activity : activity_list) {
 
-            HBox hbox = new HBox();
+            VBox vbox = new VBox();
 
             Button delete_button = new Button();
             delete_button.setOnMouseClicked((event) -> {
                 delete_event(event, activity);
-                list_vbox.getChildren().remove(hbox);
+                list_view.getItems().remove(vbox);
+                main_calendar_controller.create_week_activities_stuff();
             });
+            delete_button.setText("Delete Activity");
 
-            hbox.getChildren().add(new Text(activity.get_title()));
-            hbox.getChildren().add(new Text(activity.get_description()));
-            hbox.getChildren().add(new Text(activity.get_start_time().toString()));
-            hbox.getChildren().add(new Text(activity.get_end_time().toString()));
-            hbox.getChildren().add(new Text(activity.get_start_date().toString()));
-            hbox.getChildren().add(new Text(activity.get_end_date().toString()));
-            hbox.getChildren().add(new Text(activity.get_repeating()));
-            hbox.getChildren().add(delete_button);
+            String style = "-fx-fill: #e2e2e3; -fx-text-fill: #e2e2e3;";
 
-            list_vbox.getChildren().add(hbox);
+            Text title_text = new Text("Name: " + activity.get_title());
+            Text description_text = new Text("Description: " + activity.get_description());
+            Text time_text = new Text("Time: " + activity.get_start_time().toString() + " - " + activity.get_end_time().toString());
+            Text date_text;
+
+            if (activity.get_start_date().isEqual(activity.get_end_date())) {
+                date_text = new Text("Date: " + activity.get_start_date().toString());
+            } else {
+                date_text = new Text("Date: " + activity.get_start_date().toString() + " - " + activity.get_end_date().toString());
+            }
+            Text repeating_text = new Text("Repeats: " + activity.get_repeating());
+
+            title_text.getStyleClass().add("title-text");
+            description_text.getStyleClass().add("description-text");
+            time_text.getStyleClass().add("time-text");
+            date_text.getStyleClass().add("date-text");
+            repeating_text.getStyleClass().add("repeating-text");
+
+            vbox.getChildren().add(title_text);
+            Spacer spacer = new Spacer();
+            spacer.setPrefHeight(10);
+            vbox.getChildren().add(spacer);
+            vbox.getChildren().add(description_text);
+            vbox.getChildren().add(time_text);
+            vbox.getChildren().add(date_text);
+            vbox.getChildren().add(repeating_text);
+            vbox.getChildren().add(delete_button);
+
+            description_text.setWrappingWidth(350);
+
+            for (Node text: vbox.getChildren()) {
+                text.setStyle(style);
+                text.maxWidth(50);
+            }
+
+            list_view.getItems().add(vbox);
+            vbox.setPadding(new Insets(10, 10, 10, 10));
+            vbox.getStyleClass().add("vbox");
         }
+        list_view.getStyleClass().add("list-view");
+        scroll_pane.getStylesheets().add(getClass().getResource("viewer.css").toExternalForm());
     }
 
     public void delete_event(Event event, CalendarActivity activity) {

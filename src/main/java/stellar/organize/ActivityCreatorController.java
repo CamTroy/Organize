@@ -2,8 +2,11 @@ package stellar.organize;
 
 import com.dlsc.gemsfx.TimePicker;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.*;
@@ -32,6 +35,9 @@ public class ActivityCreatorController extends MainCalendarController {
 
     @FXML
     private Button create_activity_button;
+
+    @FXML
+    private AnchorPane anchor_pane;
     
     private MainCalendarController main_calendar_controller;
 
@@ -55,24 +61,40 @@ public class ActivityCreatorController extends MainCalendarController {
         if (start_date_picker.getValue() == null ||
                 end_date_picker.getValue() == null ||
                 activity_name_field.getText() == null || activity_name_field.getText().trim().isEmpty() ||
-                activity_description_field.getText() == null || activity_description_field.getText().trim().isEmpty() ||
-                start_time_picker.getTime() == null ||
-                end_time_picker.getTime() == null ||
                 repeating_choice_box.getSelectionModel().getSelectedItem() == null) {
             return;
         }
 
-        LocalDate activity_start_localdate = LocalDate.parse(start_date_picker.getValue().toString());
-        ZonedDateTime activity_start_date = activity_start_localdate.atStartOfDay(ZoneId.systemDefault());
+        if (start_time_picker.getTime().equals(end_time_picker.getTime())) {
+            end_time_picker.setTime(start_time_picker.getTime().plusMinutes(15));
+        }
 
-        LocalDate activity_end_localdate = LocalDate.parse(end_date_picker.getValue().toString());
-        ZonedDateTime activity_end_date = activity_end_localdate.atStartOfDay(ZoneId.systemDefault());
+        String activity_description;
+        if (activity_description_field.getText() == null || activity_description_field.getText().trim().isEmpty()) {
+
+            activity_description = "";
+        } else {
+           activity_description = activity_description_field.getText();
+        }
+
+        LocalTime activity_start_time = null;
+        LocalTime activity_end_time = null;
+        if ((all_day_checkbox.isSelected())) {
+
+            activity_start_time = LocalTime.of(0, 0);
+            activity_end_time = LocalTime.of(23, 59);
+        } else if (start_time_picker.getTime() == null || end_time_picker.getTime() == null) {
+            return;
+        } else {
+
+            activity_start_time = start_time_picker.getTime();
+            activity_end_time = end_time_picker.getTime();
+        }
+
+        LocalDate activity_start_date = start_date_picker.getValue();
+        LocalDate activity_end_date = end_date_picker.getValue();
 
         String activity_name = activity_name_field.getText();
-        String activity_description = activity_description_field.getText();
-
-        LocalTime activity_start_time = start_time_picker.getTime();
-        LocalTime activity_end_time = end_time_picker.getTime();
 
         String location = "";
 
@@ -87,14 +109,6 @@ public class ActivityCreatorController extends MainCalendarController {
             Random rand = new Random();
             int random_number = rand.nextInt(100000) + 1;
             activity_name = String.valueOf(random_number);
-        }
-
-        if (activity_end_time.isBefore(activity_start_time)) {
-            activity_end_time = activity_start_time.plusMinutes(15);
-        }
-
-        if (activity_end_date.isBefore(activity_start_date)) {
-            activity_end_date = activity_start_date;
         }
 
         CalendarActivity activity;
@@ -116,12 +130,16 @@ public class ActivityCreatorController extends MainCalendarController {
                 main_calendar_controller.send_notification(activity);
             });
         } else {
+            System.out.println("Schedule non-repeating.");
             schedule_task(target_date_time, () -> {
                 main_calendar_controller.send_notification(activity);
             });
         }
 
+        main_calendar_controller.create_week_activities_stuff();
         main_calendar_controller.make_month();
+        Stage stage = (Stage) create_activity_button.getScene().getWindow();
+        stage.close();
     }
 
     public void set_all_day(ActionEvent event) {
@@ -130,4 +148,32 @@ public class ActivityCreatorController extends MainCalendarController {
         start_time_picker.setVisible(all_day);
         end_time_picker.setVisible(all_day);
     }
+
+    public void correct_end_time(Event event) {
+
+        if (end_time_picker.getTime() == null || start_time_picker.getTime().isAfter(end_time_picker.getTime())) {
+            end_time_picker.setTime(start_time_picker.getTime());
+        }
+    }
+
+    public void correct_end_date(Event event) {
+
+        if (end_date_picker.getValue() == null || start_date_picker.getValue().isAfter(end_date_picker.getValue())) {
+            end_date_picker.setValue(start_date_picker.getValue());
+        }
+    }
+
+    // public void correct_start_time(Event event) {
+    //
+    //     if (start_time_picker.getTime() == null || end_time_picker.getTime().isBefore(start_time_picker.getTime())) {
+    //         start_time_picker.setTime(end_time_picker.getTime().minusMinutes(15));
+    //     }
+    // }
+    //
+    // public void correct_start_date(Event event) {
+    //
+    //     if (start_date_picker.getValue() == null || end_date_picker.getValue().isBefore(start_date_picker.getValue())) {
+    //         start_date_picker.setValue(end_date_picker.getValue());
+    //     }
+    // }
 }

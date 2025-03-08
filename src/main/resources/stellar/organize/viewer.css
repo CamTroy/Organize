@@ -1,0 +1,55 @@
+.title-text {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.description-text {
+    -fx-font-size: 14px;
+}
+
+.time-text {
+    -fx-font-size: 12px;
+}
+
+.end-time-text {
+    -fx-font-size: 12px;
+}
+
+.date-text {
+    -fx-font-size: 12px;
+}
+
+.repeating-text {
+    -fx-font-size: 14px;
+}
+
+.text {
+    -fx-fill: #e2e2e3;
+    -fx-text-fill: #e2e2e3;
+}
+
+.list-view {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .content {
+    -fx-background-color: #2c2e34;
+    -fx-fill: #2c2e34;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: #2c2e34;
+    -fx-fill: #2c2e34;
+}
+
+.vbox {
+    -fx-background-color: transparent;
+}
+
+.list-view .vbox {
+    -fx-background-color: transparent;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+}

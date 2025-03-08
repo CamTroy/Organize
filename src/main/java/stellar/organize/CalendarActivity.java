@@ -1,16 +1,14 @@
 package stellar.organize;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 
 public class CalendarActivity {
 
     private String title;
     private String description;
-    private ZonedDateTime start_date;
-    private ZonedDateTime end_date;
+    private LocalDate start_date;
+    private LocalDate end_date;
     private LocalTime start_time;
     private LocalTime end_time;
     private String repeating;
@@ -18,14 +16,14 @@ public class CalendarActivity {
 
     private final String[] repeating_values = {"Daily", "Weekly", "Monthly", "Yearly", "None"};
 
-    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date) {
+    public CalendarActivity(String title, String description, LocalDate start_date, LocalDate end_date) {
         this.title = title;
         this.description = description;
         this.start_date = start_date;
         this.end_date = end_date;
     }
 
-    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date, LocalTime start_time, LocalTime end_time) {
+    public CalendarActivity(String title, String description, LocalDate start_date, LocalDate end_date, LocalTime start_time, LocalTime end_time) {
         this.title = title;
         this.description = description;
         this.start_date = start_date;
@@ -34,7 +32,7 @@ public class CalendarActivity {
         this.end_time = end_time;
     }
 
-    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date, LocalTime start_time, LocalTime end_time, String repeating) {
+    public CalendarActivity(String title, String description, LocalDate start_date, LocalDate end_date, LocalTime start_time, LocalTime end_time, String repeating) {
         this.title = title;
         this.description = description;
         this.start_date = start_date;
@@ -44,7 +42,7 @@ public class CalendarActivity {
         this.repeating = repeating;
     }
 
-    public CalendarActivity(String title, String description, ZonedDateTime start_date, ZonedDateTime end_date, LocalTime start_time, LocalTime end_time, String repeating, String location) {
+    public CalendarActivity(String title, String description, LocalDate start_date, LocalDate end_date, LocalTime start_time, LocalTime end_time, String repeating, String location) {
         this.title = title;
         this.description = description;
         this.start_date = start_date;
@@ -65,11 +63,11 @@ public class CalendarActivity {
         return description;
     }
 
-    public ZonedDateTime get_start_date() {
+    public LocalDate get_start_date() {
         return start_date;
     }
 
-    public ZonedDateTime get_end_date() {
+    public LocalDate get_end_date() {
         return end_date;
     }
 
@@ -97,11 +95,11 @@ public class CalendarActivity {
         this.description = description;
     }
 
-    public void set_start_date(ZonedDateTime start_date) {
+    public void set_start_date(LocalDate start_date) {
         this.start_date = start_date;
     }
 
-    public void set_end_date(ZonedDateTime end_date) {
+    public void set_end_date(LocalDate end_date) {
         this.end_date = end_date;
     }
 

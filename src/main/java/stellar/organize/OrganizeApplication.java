@@ -24,9 +24,9 @@ public class OrganizeApplication extends Application {
 
         stage.getIcons().add(icon);
         stage.setTitle("Organize");
-        stage.setHeight(800);
-        stage.setWidth(1280);
         stage.setScene(scene);
+        stage.setMinHeight(600);
+        stage.setMinWidth(960);
         stage.show();
 
         calendar_controller = fxmlLoader.getController();

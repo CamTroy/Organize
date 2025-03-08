@@ -10,10 +10,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stellar.organize.ActivityCreatorController">
+<AnchorPane prefHeight="600.0" prefWidth="400.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stellar.organize.ActivityCreatorController">
    <children>
-      <DatePicker fx:id="start_date_picker" layoutX="230.0" layoutY="90.0" prefHeight="28.0" prefWidth="150.0" promptText="Start Date" />
-      <DatePicker fx:id="end_date_picker" layoutX="230.0" layoutY="130.0" prefHeight="28.0" prefWidth="150.0" promptText="End date" />
+      <DatePicker fx:id="start_date_picker" layoutX="230.0" layoutY="90.0" onAction="#correct_end_date" prefHeight="28.0" prefWidth="150.0" promptText="Start Date" />
+      <DatePicker fx:id="end_date_picker" layoutX="230.0" layoutY="130.0" onAction="#correct_end_date" prefHeight="28.0" prefWidth="150.0" promptText="End date" />
       <TextField fx:id="activity_name_field" layoutX="20.0" layoutY="14.0" prefHeight="33.0" prefWidth="360.0" promptText="Name" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="14.0">
          <font>
             <Font size="16.0" />
@@ -24,8 +24,8 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <TimePicker fx:id="start_time_picker" layoutX="20.0" layoutY="90.0" prefHeight="28.0" prefWidth="150.0" promptText="Start time" stepRateInMinutes="15" />
-      <TimePicker fx:id="end_time_picker" layoutX="20.0" layoutY="130.0" prefHeight="28.0" prefWidth="150.0" promptText="End time" stepRateInMinutes="15" />
+      <TimePicker fx:id="start_time_picker" layoutX="20.0" layoutY="90.0" onAction="#correct_end_time" prefHeight="28.0" prefWidth="150.0" promptText="Start time" stepRateInMinutes="15" />
+      <TimePicker fx:id="end_time_picker" layoutX="20.0" layoutY="130.0" onAction="#correct_end_time" prefHeight="28.0" prefWidth="150.0" promptText="End time" stepRateInMinutes="15" />
       <CheckBox fx:id="all_day_checkbox" layoutX="20" layoutY="170" mnemonicParsing="false" onAction="#set_all_day" text="All day">
          <font>
             <Font size="14.0" />

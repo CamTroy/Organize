@@ -31,6 +31,114 @@
     -fx-border-radius: 10px;
 }
 
+.text-field {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.text-area {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-text-fill: -white;
+}
+
+.text-area .scroll-pane .content {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.text-area .scroll-pane .viewport {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.choice-box {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.time-picker, .date-picker {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.date-picker .day-cell {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+}
+
+.date-picker .day-cell {
+    -fx-background-color: -gray0;
+    -fx-text-fill: -white;
+    -fx-padding: 10px;
+    -fx-font-size: 12px;
+}
+.date-picker .calendar-header {
+    -fx-background-color: -gray0;
+    -fx-border-radius: 10px;
+    -fx-border-color: -gray;
+}
+
+.date-picker .day-cell.today {
+    -fx-background-color: -gray;
+    -fx-text-fill: -white;
+}
+
+.date-picker .day-cell:hover {
+    -fx-background-color: -purple;
+}
+
+.date-picker .day-cell:selected {
+    -fx-background-color: -gray-dim;
+}
+
+.date-picker .popup {
+    -fx-background-color: -bg-color;
+    -fx-border-radius: 10px;
+    -fx-border-color: -gray;
+}
+
+.date-picker .calendar-header {
+    -fx-background-color: -gray_dim;
+    -fx-text-fill: -white;
+    -fx-padding: 5px;
+    -fx-font-size: 14px;
+}
+
+.date-picker .calendar-header .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -white;
+    -fx-border-color: -gray;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-base: -gray;
+}
+
+.calendar-grid {
+    -fx-background-color: -gray_dim;
+}
+
 #prev_month_button, #next_month_button, #today_button {
     -fx-background-color: -gray0;
     -fx-border-color: -gray;
@@ -41,4 +149,3 @@
 #month_text, #year_text {
     -fx-fill: -white;
 }
-
