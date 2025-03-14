@@ -139,6 +139,20 @@
     -fx-background-color: -gray_dim;
 }
 
+.choice-box .context-menu {
+    -fx-background-color: -bg-color;
+    -fx-border-radius: 10px;
+    -fx-border-color: -gray;
+    -fx-text-fill: -white;
+}
+
+.context-menu {
+    -fx-background-color: -bg-color;
+    -fx-border-radius: 10px;
+    -fx-border-color: -gray;
+    -fx-text-fill: -white;
+}
+
 #prev_month_button, #next_month_button, #today_button {
     -fx-background-color: -gray0;
     -fx-border-color: -gray;

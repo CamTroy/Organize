@@ -4,12 +4,12 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 
-<ScrollPane fx:id="scroll_pane" hbarPolicy="NEVER" maxHeight="450.0" maxWidth="450.0" minHeight="450.0" minWidth="450.0" prefHeight="450.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="stellar.organize.ActivityViewerController">
-   <content>
-      <ListView fx:id="list_view" prefWidth="450.0" stylesheets="@application.css" />
-   </content>
+<ScrollPane fx:id="scroll_pane" hbarPolicy="NEVER" maxHeight="450.0" maxWidth="450.0" minHeight="450.0" minWidth="450.0"
+            prefHeight="450.0" prefWidth="450.0" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/23.0.1" fx:controller="stellar.organize.ActivityViewerController">
    <stylesheets>
-      <URL value="@application.css" />
-      <URL value="@viewer.css" />
+      <URL value="@application.css"/>
+      <URL value="@viewer.css"/>
    </stylesheets>
+   <ListView fx:id="list_view" prefWidth="450.0" stylesheets="@application.css"/>
 </ScrollPane>

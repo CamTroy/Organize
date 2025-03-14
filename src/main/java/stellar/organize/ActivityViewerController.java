@@ -43,6 +43,7 @@ public class ActivityViewerController extends MainCalendarController {
         for (CalendarActivity activity : activity_list) {
 
             VBox vbox = new VBox();
+            vbox.setSpacing(5);
 
             Button delete_button = new Button();
             delete_button.setOnMouseClicked((event) -> {
@@ -54,15 +55,15 @@ public class ActivityViewerController extends MainCalendarController {
 
             String style = "-fx-fill: #e2e2e3; -fx-text-fill: #e2e2e3;";
 
-            Text title_text = new Text("Name: " + activity.get_title());
-            Text description_text = new Text("Description: " + activity.get_description());
-            Text time_text = new Text("Time: " + activity.get_start_time().toString() + " - " + activity.get_end_time().toString());
+            Text title_text = new Text(activity.get_title());
+            Text description_text = new Text(activity.get_description());
+            Text time_text = new Text(activity.get_start_time().toString() + " - " + activity.get_end_time().toString());
             Text date_text;
 
             if (activity.get_start_date().isEqual(activity.get_end_date())) {
-                date_text = new Text("Date: " + activity.get_start_date().toString());
+                date_text = new Text(activity.get_start_date().toString());
             } else {
-                date_text = new Text("Date: " + activity.get_start_date().toString() + " - " + activity.get_end_date().toString());
+                date_text = new Text(activity.get_start_date().toString() + " - " + activity.get_end_date().toString());
             }
             Text repeating_text = new Text("Repeats: " + activity.get_repeating());
 

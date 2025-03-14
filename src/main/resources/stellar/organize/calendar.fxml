@@ -13,7 +13,7 @@
 
 <BorderPane fx:id="border_pane" maxHeight="Infinity" maxWidth="Infinity" minHeight="700.0" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="stellar.organize.MainCalendarController">
    <center>
-      <HBox fx:id="main_hbox" alignment="CENTER" maxHeight="10000.0" maxWidth="10000.0" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="main_hbox" alignment="CENTER" maxHeight="1080.0" maxWidth="10000.0" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <VBox fx:id="calendar_vbox" alignment="CENTER_LEFT" maxHeight="10000.0" maxWidth="300.0" spacing="10.0">
                <Button fx:id="open_creator_button" alignment="CENTER" mnemonicParsing="false" onAction="#open_activity_creator" prefHeight="60.0" prefWidth="180.0" text="Create activity" textAlignment="CENTER">
@@ -35,56 +35,63 @@
                   </VBox.margin>
                </CheckBox>
             </VBox>
-            <VBox alignment="CENTER_LEFT" prefHeight="700.0" prefWidth="822.0" HBox.hgrow="ALWAYS">
+            <VBox alignment="CENTER_LEFT" maxHeight="1080.0" prefHeight="700.0" prefWidth="822.0" HBox.hgrow="ALWAYS">
                <children>
-                  <HBox alignment="CENTER_LEFT" maxWidth="600.0" prefHeight="60.0" prefWidth="470.0">
-                     <children>
-                        <Button fx:id="today_button" mnemonicParsing="false" onAction="#bring_to_today" prefHeight="41.0" prefWidth="109.0" text="Today">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button fx:id="prev_month_button" alignment="CENTER" minWidth="100.0" mnemonicParsing="false" onAction="#go_to_prev_month" prefHeight="60.0" prefWidth="100.0" text="Previous">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Spacer prefWidth="20.0" />
-                        <Text fx:id="month_text" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER">
-                           <font>
-                              <Font size="30.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </HBox.margin>
-                        </Text>
-                        <Spacer prefWidth="20.0" />
-                        <Text fx:id="year_text" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER">
-                           <font>
-                              <Font size="30.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </HBox.margin>
-                        </Text>
-                        <Spacer prefWidth="20.0" />
-                        <Button fx:id="next_month_button" alignment="CENTER" minWidth="100.0" mnemonicParsing="false" onAction="#go_to_next_month" prefHeight="60.0" prefWidth="100.0" text="Next">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </HBox.margin>
-                        </Button>
-                     </children>
+                  <HBox alignment="CENTER_LEFT" maxWidth="1000.0" prefHeight="60.0" prefWidth="699.0" spacing="10">
+                     <Button fx:id="today_button" mnemonicParsing="false" onAction="#bring_to_today" prefHeight="41.0"
+                             prefWidth="109.0" text="Today">
+                        <font>
+                           <Font size="18.0"/>
+                        </font>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                     </Button>
+                     <Button fx:id="prev_month_button" alignment="CENTER" minWidth="100.0" mnemonicParsing="false"
+                             onAction="#go_to_prev_month" prefHeight="60.0" prefWidth="120.0" text="Previous">
+                        <font>
+                           <Font size="18.0"/>
+                        </font>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                     </Button>
+                     <Text fx:id="month_text" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER">
+                        <font>
+                           <Font size="30.0"/>
+                        </font>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                     </Text>
+                     <Text fx:id="year_text" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER">
+                        <font>
+                           <Font size="30.0"/>
+                        </font>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                     </Text>
+                     <Button fx:id="next_month_button" alignment="CENTER" minWidth="100.0" mnemonicParsing="false"
+                             onAction="#go_to_next_month" prefHeight="60.0" prefWidth="100.0" text="Next">
+                        <font>
+                           <Font size="18.0"/>
+                        </font>
+                        <HBox.margin>
+                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </HBox.margin>
+                     </Button>
                   </HBox>
-                  <FlowPane fx:id="month_flowpane" hgap="10.0" prefHeight="639.0" prefWidth="800.0" vgap="5.0">
+                  <HBox fx:id="days_of_week_box" alignment="CENTER">
+                     <Text fill="#e2e2e3" text="Su" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="Mo" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="Tu" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="We" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="Th" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="Fr" textAlignment="CENTER" />
+                     <Text fill="#e2e2e3" text="Sa" textAlignment="CENTER" />
+                  </HBox>
+                  <FlowPane fx:id="month_flowpane" hgap="10.0" maxHeight="1080.0" prefHeight="639.0" prefWidth="800.0" vgap="5.0">
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>

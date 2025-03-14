@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
+import javafx.beans.binding.DoubleBinding;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -55,7 +56,7 @@ public class MainCalendarController implements Initializable {
     private VBox week_activity_vbox, calendar_vbox;
 
     @FXML
-    private HBox main_hbox;
+    private HBox main_hbox, days_of_week_box;
 
     ZonedDateTime date_focus, today;
 
@@ -95,13 +96,18 @@ public class MainCalendarController implements Initializable {
         create_week_activities_stuff();
         dnd_checkbox.setSelected(do_not_disturb);
         make_month();
+        // DoubleBinding spacingBinding = days_of_week_box.widthProperty().divide(7).subtract(10);
+        // days_of_week_box.spacingProperty().bind(spacingBinding);
+        double spacing_h = month_flowpane.getHgap();
+        days_of_week_box.prefWidthProperty().bind(month_flowpane.widthProperty());
+        days_of_week_box.spacingProperty().bind(days_of_week_box.prefWidthProperty().divide(7).subtract(spacing_h));
         VBox.setVgrow(month_flowpane, Priority.ALWAYS);
         HBox.setHgrow(calendar_vbox, Priority.ALWAYS);
         main_hbox.maxWidthProperty().bind(border_pane.widthProperty());
         main_hbox.maxHeightProperty().bind(border_pane.heightProperty());
         setup_notifications_on_start(activity_list);
         // border_pane.widthProperty().addListener((obs, old_val, new_val) -> {
-        //
+        //     make_month();
         // });
     }
 
